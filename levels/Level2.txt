@@ -1,0 +1,11 @@
+W W W W W W W W W W W W W W W W W W
+W - - - - - - - - - - - - - - - - W
+W - - - B - - - - - - - - B - - - W 
+W - P - - W W - - - - - W W W - - W 
+W - - - - W - - - - - - - W - - - W 
+W - - - W W - - - B - W - W - W W W 
+W - - W - W - - - - - W - W - W - W 
+W - - W H C - - - - - W - W - - - W 
+W W - W - - - - - - - W - - - - - W 
+W - - - - - W - - W - - - - - - - W 
+W W W W W W W W W W W W W W W W W W
