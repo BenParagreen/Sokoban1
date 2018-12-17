@@ -138,3 +138,4 @@ bool Player::AttemptMove(sf::Vector2i _Direction)
 	//if movement is blocked, do nothing, return false
 	return false;
 }
+

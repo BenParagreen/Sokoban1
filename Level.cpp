@@ -4,6 +4,8 @@
 #include "Wall.h"
 #include "Box.h"
 #include "Player.h"
+#include "StorageObject.h"
+
 
 //library includes
 #include <iostream>
@@ -12,6 +14,7 @@
 Level::Level()
 	:m_CellSize(64.0f)
 	,m_CurrentLevel(0)
+	,m_pendingLevel(0)
 	,m_Background()
 	,m_Contents()
 {
@@ -75,6 +78,16 @@ void Level::Update(sf::Time _FrameTime)
 			}
 		}
 	}
+
+	// If there is a pending level waiting 
+	if (m_pendingLevel != 0)
+	{
+		//Load it
+		LoadLevel(m_pendingLevel);
+        // Remove pending level
+		m_pendingLevel = 0;
+	}
+	
 }
 
 void Level::Input(sf::Event _GameEvent)
@@ -107,9 +120,9 @@ void Level::LoadLevel(int _LevelToLoad)
 		for (int x = 0; x <  m_Contents[y].size(); ++x)
 		{	
 			//Z = stickoutty(GridObjects)
-			for (int z = 0; z < m_Contents[z].size(); ++z)
+			for (int z = 0; z < m_Contents[y][x].size(); ++z)
 			{
-				delete m_Contents[x][y][z];
+				delete m_Contents[y][x][z];
 			}
 		}
 	}
@@ -196,6 +209,13 @@ void Level::LoadLevel(int _LevelToLoad)
 				 box->SetLevel(this);
 				 box->SetGridPosition(x, y);
 				 m_Contents[y][x].push_back(box);
+			 }
+			 else if (ch == 'S')
+			 {
+				 StorageObject* storageObject = new StorageObject();
+				 storageObject->SetLevel(this);
+				 storageObject->SetGridPosition(x, y);
+				 m_Contents[y][x].push_back(storageObject);
 			 }
 			 else if (ch == 'P')
 			 {
@@ -294,4 +314,46 @@ std::vector<GridObject* > Level::GetObjectAt(sf::Vector2i _TargetPos)
 	//(Default constructor)
 	return std::vector<GridObject*>();
 
+}
+
+bool Level::CheckComplete()
+{
+	//Loop through and check all boxes to see if they are stored
+	//Y = Rows
+	for (int y = 0; y < m_Contents.size(); ++y)
+	{
+		//X = Cells
+		for (int x = 0; x < m_Contents[y].size(); ++x)
+		{
+			//Z = stickoutty(GridObjects)
+			for (int z = 0; z < m_Contents[y][x].size(); ++z)
+			{
+				GridObject* thisObject = m_Contents[y][x][z];
+
+				Box* boxObject = dynamic_cast<Box*>(thisObject);
+				if (boxObject != nullptr)
+				{
+					// It was a box
+
+					// Is it stored?
+					if (boxObject->GetStored() == false)
+					{
+						//Any single box being unstored means level is not yet complete
+						return false;
+					}
+				}
+			}
+		}
+	}
+
+	//All boxes were Stored so level is complete
+
+	//TODO Add victory music
+
+	//queue the next level to load during the next update
+	// If we change level right away we get an access violation due to update still running
+	m_pendingLevel = m_CurrentLevel + 1;
+
+	//The level is complete so return true
+	return true;
 }
